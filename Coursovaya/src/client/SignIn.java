@@ -1,10 +1,15 @@
 package client;
 
+import com.mysql.cj.x.protobuf.MysqlxExpr;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.*;
+import java.net.Socket;
+import java.sql.ResultSet;
 
 public class SignIn extends JFrame implements ActionListener, WindowListener {
     private JTextField passwordSignIn;
@@ -14,52 +19,63 @@ public class SignIn extends JFrame implements ActionListener, WindowListener {
     private JLabel jLabel2;
     private JTextField loginSignIn;
     private JPanel panel;
+    private Socket sock;
+    private int flag = 0;
+    //private DataInputStream is = null;
+    //private DataOutputStream os = null;
+    private static ObjectInputStream ois;
+    private static ObjectOutputStream oos;
+    private int [] id;
+    private String[] login;
+    private String[] password;
 
-    public SignIn(){
+    public SignIn(Socket sock, ObjectOutputStream oos, ObjectInputStream ois){
+        this.sock = sock;
+        //this.is = is;
+        //this.os = os;
+        this.ois = ois;
+        this.oos = oos;
         setTitle("Вход");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
-        setLocationRelativeTo(null);
+        setLocation(510,210);
+        //setLocationRelativeTo(null);
         setSize(500,400);
         panel = new JPanel();
         panel.setLayout(null);
 
         passwordSignIn = new JTextField();
-        //PasswordSignIn.setBounds(200, 250, 100, 40);
         passwordSignIn.setSize(200, 40);
         passwordSignIn.setLocation(150, 160);
         passwordSignIn.setVisible(true);
         panel.add(passwordSignIn);
         loginSignIn = new JTextField();
-        //loginSignIn.setBounds(200, 100, 100, 40);
         loginSignIn.setSize(200, 40);
         loginSignIn.setLocation(150, 80);
         loginSignIn.setVisible(true);
         panel.add(loginSignIn);
 
         jLabel1 = new JLabel("Логин");
-        //jLabel1.setBounds(200, 70, 50, 20);
         jLabel1.setLocation(150, 50);
         jLabel1.setSize(50,20);
         jLabel1.setVisible(true);
         panel.add(jLabel1);
         jLabel2 = new JLabel("Пароль");
-        //jLabel2.setBounds(200, 220, 50, 20);
         jLabel2.setSize(50, 20);
         jLabel2.setLocation(150, 130);
         jLabel2.setVisible(true);
         panel.add(jLabel2);
 
         sendSignIn = new JButton("Войти");
-        //sendSignIn.setBounds(250, 280, 65, 20);
         sendSignIn.setSize(120, 40);
         sendSignIn.setLocation(190, 220);
+        sendSignIn.addActionListener(this::actionPerformed);
         sendSignIn.setVisible(true);
         panel.add(sendSignIn);
         registerSignIn = new JButton("Регистрация");
-        //registerSignIn.setBounds(250, 310, 65, 20);
         registerSignIn.setSize(120, 40);
         registerSignIn.setLocation(190, 270);
+        registerSignIn.addActionListener(this::actionRegPerfomed);
         registerSignIn.setVisible(true);
         panel.add(registerSignIn);
 
@@ -67,14 +83,77 @@ public class SignIn extends JFrame implements ActionListener, WindowListener {
         setVisible(true);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {}
+    public void actionRegPerfomed(ActionEvent e){
+        RegisterDialog rd = new RegisterDialog(panel, ois, oos);
+        panel.setVisible(false);
+    }
 
     @Override
-    public void windowOpened(WindowEvent e) {}
+    public void actionPerformed(ActionEvent e) {
+        if (!loginSignIn.getText().isEmpty() & !passwordSignIn.getText().isEmpty()) {
+            try {
+                //if (flag==0) {
+                    Integer num = 1;
+                    oos.writeUTF(num.toString());
+                    oos.flush();
+                    flag++;
+                //}
+                String log = new String();
+                String pas = new String();
+                String res = new String();
+                log = loginSignIn.getText();
+                pas = passwordSignIn.getText();
+                res = log + " " + pas;
+                oos.writeUTF(res);
+                oos.flush();
+                loginSignIn.setText("");
+                passwordSignIn.setText("");
+                String line = ois.readUTF();
+                System.out.println(line);
+                if (Integer.parseInt(line) == (Integer)1) {
+                    System.out.println("here");
+                    line = ois.readUTF();
+                    System.out.println(line);
+                    if (line.equals("A")){
+                        Integer number = 0;
+                        num = 3;
+                        oos.writeUTF(num.toString());
+                        oos.flush();
+                        ResultSet rs = null;
+                        Integer num1 = 0;
+                        num1 = (Integer) ois.readObject();
+                        System.out.println(num1);
+                        server.User user = (server.User) ois.readObject();
+                        AdminFrame af = new AdminFrame(panel, oos, ois, user, num1);
+                        af.setVisible(true);
+                    }
+                } else {
+                    WarningDialog wd = new WarningDialog(panel);
+                    wd.setVisible(true);
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        }
+        else {
+        }
+    }
+
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+
+    }
 
     @Override
     public void windowClosing(WindowEvent e) {
+        try{
+            sock.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         this.dispose();
     }
 
