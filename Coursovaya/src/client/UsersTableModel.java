@@ -18,6 +18,11 @@ public class UsersTableModel extends AbstractTableModel {
         String[] rowTable = new String[getColumnCount()];
         rowTable = row;
         data.add(rowTable);
+        this.fireTableDataChanged();
+    }
+
+    public void deleteData(){
+        data.clear();
     }
 
     @Override

@@ -34,10 +34,10 @@ public class ClientHandler implements Runnable{
     @Override
     public void run() {
         try{
-            String line; Integer num = 0;
+            Integer num = 0;
             while (true/*(line=ois.readUTF())!=null*/) {
                 System.out.println("Ожидание");
-                line=ois.readUTF();
+                String line=ois.readUTF();
                 //System.out.println(line);
                 num = Integer.parseInt(line);
                 System.out.println(num);
@@ -128,6 +128,27 @@ public class ClientHandler implements Runnable{
                         User user = new User(rs);
                         oos.writeObject((User)user);
                         System.out.println("Конец 3");
+                    }break;
+                    case 4: {
+                        line = ois.readUTF();
+                        String[] val = line.split(" ");
+                        String query = "DELETE FROM users WHERE idПользователя="+val[0];
+                        stmt.executeUpdate(query);
+                        oos.writeUTF("Command proceeded");
+                        oos.flush();
+                        System.out.println("Конец 4");
+                    }break;
+                    case 5: {
+                        line = ois.readUTF();
+                        String[] val = line.split(" ");
+                        PreparedStatement prep = connection.prepareStatement("UPDATE users SET Логин=?, Пароль=? WHERE idПользователя=?");
+                        prep.setString(1,val[1]);
+                        prep.setString(2,val[2]);
+                        prep.setString(3,val[0]);
+                        prep.execute();
+                        oos.writeUTF("Command proceeded");
+                        oos.flush();
+                        System.out.println("Конец 5");
                     }break;
                 }
             }

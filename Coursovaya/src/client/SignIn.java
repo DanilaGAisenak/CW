@@ -15,6 +15,7 @@ public class SignIn extends JFrame implements ActionListener, WindowListener {
     private JTextField passwordSignIn;
     private JButton sendSignIn;
     private JButton registerSignIn;
+    private JButton closeSignIn;
     private JLabel jLabel1;
     private JLabel jLabel2;
     private JTextField loginSignIn;
@@ -78,13 +79,30 @@ public class SignIn extends JFrame implements ActionListener, WindowListener {
         registerSignIn.addActionListener(this::actionRegPerfomed);
         registerSignIn.setVisible(true);
         panel.add(registerSignIn);
+        closeSignIn = new JButton("Выход");
+        closeSignIn.setSize(100,35);
+        closeSignIn.setLocation(350,300);
+        closeSignIn.addActionListener(this::actionClosePerformed);
+        closeSignIn.setVisible(true);
+        panel.add(closeSignIn);
 
         setContentPane(panel);
         setVisible(true);
     }
 
+    public void actionClosePerformed(ActionEvent e){
+        try{
+            sock.close();
+            oos.close();
+            ois.close();
+            this.dispose();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
     public void actionRegPerfomed(ActionEvent e){
-        RegisterDialog rd = new RegisterDialog(panel, ois, oos);
+        Register rd = new Register(null,true,panel, ois, oos);
+        rd.setVisible(true);
         panel.setVisible(false);
     }
 
@@ -119,17 +137,16 @@ public class SignIn extends JFrame implements ActionListener, WindowListener {
                         num = 3;
                         oos.writeUTF(num.toString());
                         oos.flush();
-                        ResultSet rs = null;
                         Integer num1 = 0;
                         num1 = (Integer) ois.readObject();
                         System.out.println(num1);
                         server.User user = (server.User) ois.readObject();
-                        AdminFrame af = new AdminFrame(panel, oos, ois, user, num1);
+                        AdminFrame af = new AdminFrame(panel, oos, ois, user, num1, this);
                         af.setVisible(true);
+                        this.setVisible(false);
                     }
                 } else {
-                    WarningDialog wd = new WarningDialog(panel);
-                    wd.setVisible(true);
+                   WarningDialog wd = new WarningDialog(null, true, panel);
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();

@@ -33,7 +33,7 @@
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.Server">
+  <component name="RunManager" selected="Application.client.Client">
     <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="server.Server" />
       <module name="CW" />
@@ -87,6 +87,7 @@
       <workItem from="1669925674533" duration="2447000" />
       <workItem from="1669928780805" duration="2261000" />
       <workItem from="1670061192154" duration="11978000" />
+      <workItem from="1670146890747" duration="18960000" />
     </task>
     <servers />
   </component>

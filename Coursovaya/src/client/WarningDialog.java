@@ -7,14 +7,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-public class WarningDialog extends JFrame implements ActionListener {
+public class WarningDialog extends JDialog implements ActionListener {
 
     private JPanel panel;
     private JPanel panel1;
     private JButton btn;
     private JLabel la;
 
-    public WarningDialog(JPanel ePanel) {
+    public WarningDialog(Frame owner, boolean modal,JPanel ePanel) {
+        super(owner, modal);
         this.panel1 = ePanel;
         setTitle("Внимание");
         //setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -40,7 +41,8 @@ public class WarningDialog extends JFrame implements ActionListener {
         setContentPane(panel);
         setVisible(true);
     }
-    public WarningDialog(JPanel epanel, String str){
+    public WarningDialog(Frame owner, boolean modal,JPanel epanel, String str){
+        super(owner, modal);
         this.panel1 = epanel;
         setTitle("Внимание");
         setResizable(false);
@@ -71,31 +73,4 @@ public class WarningDialog extends JFrame implements ActionListener {
         panel1.setVisible(true);
         this.dispose();
     }
-
-    //@Override
-    //public void windowOpened(WindowEvent e) {}
-//
-    //@Override
-    //public void windowClosing(WindowEvent e) {
-    //    //panel.setVisible(false);
-    //    //panel1.setVisible(true);
-    //    //this.dispose();
-    //}
-//
-    //@Override
-    //public void windowClosed(WindowEvent e) {
-    //    panel1.setVisible(true);
-    //}
-//
-    //@Override
-    //public void windowIconified(WindowEvent e) {}
-//
-    //@Override
-    //public void windowDeiconified(WindowEvent e) {}
-//
-    //@Override
-    //public void windowActivated(WindowEvent e) {}
-//
-    //@Override
-    //public void windowDeactivated(WindowEvent e) {}
 }
